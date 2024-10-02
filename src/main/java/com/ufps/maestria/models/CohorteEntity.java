@@ -82,7 +82,7 @@ public class CohorteEntity implements Serializable {
      * Relación uno a muchos entre Cohorte y Aspirante
      */
     @JsonIgnore
-    @OneToMany(fetch=FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "cohorte")
+    @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "cohorte")
     private List<AspiranteEntity> aspirantes = new ArrayList<>();
 
 }

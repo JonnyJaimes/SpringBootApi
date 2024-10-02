@@ -74,35 +74,49 @@ public class NotificacionService implements NotificacionServiceInterface {
     }
 
     public void crearNotificacion(String mensaje, Integer aspiranteId) {
-        try{
+        try {
             NotificacionEntity notificacion = new NotificacionEntity();
             notificacion.setEnunciado(mensaje);
             notificacion.setEstado(false);
             notificacion.setFecha_envio(new java.sql.Date(System.currentTimeMillis()));
-            if(aspiranteId>0){
+
+            if (aspiranteId > 0) {
                 AspiranteEntity aspirante = aspiranteRepository.findById(aspiranteId).orElse(null);
-                if(aspirante != null){
+                if (aspirante != null) {
+                    if (aspirante.getNotificaciones() == null) {
+                        aspirante.setNotificaciones(new ArrayList<>());
+                    }
                     notificacion.setAspirante(aspirante);
                     aspirante.getNotificaciones().add(notificacion);
                     aspiranteRepository.save(aspirante);
                     emailService.sendListEmail(aspirante.getCorreoPersonal(), "Notificación de su proceso de admisión", mensaje);
-                }else {
+                } else {
                     throw new EntityNotFoundException("No se encontró el aspirante con el ID: " + aspiranteId);
                 }
-            }else{
+            } else {
                 CohorteEntity cohorte = cohorteRepository.findCohorteByHabilitado(true);
-                List<AspiranteEntity> aspirantes = cohorte.getAspirantes();
-                for (AspiranteEntity aspirante: aspirantes) {
-                    notificacion.setAspirante(aspirante);
-                    aspirante.getNotificaciones().add(notificacion);
-                    emailService.sendListEmail(aspirante.getCorreoPersonal(), "Notificación de su proceso de admisión", mensaje);
-                    aspiranteRepository.save(aspirante);
+                if (cohorte != null) {
+                    List<AspiranteEntity> aspirantes = cohorte.getAspirantes();
+                    for (AspiranteEntity aspirante : aspirantes) {
+                        if (aspirante.getNotificaciones() == null) {
+                            aspirante.setNotificaciones(new ArrayList<>());
+                        }
+                        notificacion.setAspirante(aspirante);
+                        aspirante.getNotificaciones().add(notificacion);
+                        emailService.sendListEmail(aspirante.getCorreoPersonal(), "Notificación de su proceso de admisión", mensaje);
+                        aspiranteRepository.save(aspirante);
+                    }
+                } else {
+                    throw new EntityNotFoundException("No se encontró una cohorte habilitada.");
                 }
             }
-        }catch (Exception e){
-            throw new EntityNotFoundException("Error al crear la notificación");
+        } catch (EntityNotFoundException e) {
+            throw e;  // Re-throw para mantener el mensaje específico de error
+        } catch (Exception e) {
+            throw new EntityNotFoundException("Error al crear la notificación: " + e.getMessage());
         }
     }
+
 
     /**
      * Método para marcar todas la notificaciones como leidas después de que se listen uwu. 

@@ -78,7 +78,7 @@ public class AspiranteController {
     }
     // AspiranteController.java
 
-    @PutMapping("/admin/edit/{id}")
+    @PutMapping("/aspirante/edit/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
     public ResponseEntity<?> editAspirante(@PathVariable Integer id, @RequestBody AspiranteDTO aspiranteDTO) {
         try {

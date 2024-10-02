@@ -29,7 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.bezkoder.springjwt.UTIL.Utileria.obtenerExtensionArchivo;
-import static com.fasterxml.jackson.databind.type.LogicalType.DateTime;
+
 
 @Service
 public class DocumentoService implements DocumetoServiceInterface {
@@ -53,6 +53,9 @@ public class DocumentoService implements DocumetoServiceInterface {
     public DocumentoDTO subirDocumento(Integer aspiranteId, String tipoDocumento, MultipartFile file) {
         // Buscar el tipo de documento
         TipoDocumentoEntity tipoDocEntity = tipoDocumentoRepository.findByNombre(tipoDocumento);
+        if (tipoDocEntity == null) {
+            throw new IllegalArgumentException("Tipo de documento no encontrado.");
+        }
 
         // Guardar archivo en el sistema de archivos
         String archivoUrl = Utileria.guardarArchivo(file, storageBasePath);
@@ -61,28 +64,40 @@ public class DocumentoService implements DocumetoServiceInterface {
         }
 
         // Crear DocumentoEntity y guardarlo en la base de datos
+        AspiranteEntity aspirante = aspiranteRepository.findById(aspiranteId)
+                .orElseThrow(() -> new IllegalArgumentException("Aspirante no encontrado"));
+
         DocumentoEntity documento = new DocumentoEntity();
-        documento.setAspirante(aspiranteRepository.findById(aspiranteId).orElseThrow(() -> new IllegalArgumentException("Aspirante no encontrado")));
+        documento.setAspirante(aspirante);
         documento.setDocumento(tipoDocEntity);
         documento.setUrl(archivoUrl);
-        documento.setFormato(obtenerExtensionArchivo(file.getOriginalFilename())); // Obtener formato del archivo
-        documento.setFecha(LocalDate.now()); // Agregar la fecha de subida
-        documento.setEstado(estadoDocRepository.findById(1).orElseThrow(() -> new IllegalArgumentException("Estado no encontrado"))); // Estado inicial
+        documento.setFormato(obtenerExtensionArchivo(file.getOriginalFilename()));
+        documento.setFecha(LocalDate.now());
+        documento.setEstado(estadoDocRepository.findById(1)
+                .orElseThrow(() -> new IllegalArgumentException("Estado no encontrado")));
 
         documentoRepository.save(documento);
 
-        return new DocumentoDTO(documento.getId(), aspiranteId, tipoDocEntity.getId(), documento.getEstado().getId(), archivoUrl, documento.getFormato(), documento.getRetroalimentacion(), documento.getFecha(), documento.getComentarios(), documento.getArchivo());
+        return new DocumentoDTO(documento.getId(), aspiranteId, tipoDocEntity.getId(), documento.getEstado().getId(),
+                archivoUrl, documento.getFormato(), documento.getRetroalimentacion(),
+                documento.getFecha(), documento.getComentarios(), documento.getArchivo());
     }
+
 
 
 
     @Override
     public List<DocumentoResponse> listarDocumentos(Integer aspiranteId) {
+        // Check if aspirante exists
+        aspiranteRepository.findById(aspiranteId)
+                .orElseThrow(() -> new IllegalArgumentException("Aspirante no encontrado"));
+
         List<DocumentoEntity> documentos = documentoRepository.findByAspiranteId(aspiranteId);
         return documentos.stream()
-                .map(doc -> new DocumentoResponse(doc.getEstado(), doc.getDocumento(),doc.getFormato(), doc.getUrl()))
+                .map(doc -> new DocumentoResponse(doc.getEstado(), doc.getDocumento(), doc.getFormato(), doc.getUrl()))
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public void cambiarEstadoDocumento(Integer documentoId, String nuevoEstado) {
@@ -90,13 +105,17 @@ public class DocumentoService implements DocumetoServiceInterface {
                 .orElseThrow(() -> new IllegalArgumentException("Documento no encontrado"));
 
         EstadoDocEntity estadoDoc = estadoDocRepository.findByNombre(nuevoEstado);
+        if (estadoDoc == null) {
+            throw new IllegalArgumentException("Estado no encontrado: " + nuevoEstado);
+        }
 
         documento.setEstado(estadoDoc);
         documentoRepository.save(documento);
 
-        // Enviar notificación basada en el nuevo estado
-        enviarNotificacion(documento.getAspirante().getId(), estadoDoc.getNombre()); // Get the aspirante's ID
+        // Optional: Implement and call the notification logic here
+        enviarNotificacion(documento.getAspirante().getId(), estadoDoc.getNombre());
     }
+
 
 
     private void enviarNotificacion(Integer aspiranteId, String estadoDocumento) {
@@ -105,6 +124,11 @@ public class DocumentoService implements DocumetoServiceInterface {
     public void cambiarEstadoDocumento(Integer aspiranteId, Integer documentoId, Integer nuevoEstadoId) {
         DocumentoEntity documentoEntity = documentoRepository.findById(documentoId)
                 .orElseThrow(() -> new IllegalArgumentException("Documento no encontrado"));
+
+        if (!documentoEntity.getAspirante().getId().equals(aspiranteId)) {
+            throw new IllegalArgumentException("El documento no pertenece al aspirante especificado.");
+        }
+
         EstadoDocEntity estado = estadoDocRepository.findById(nuevoEstadoId)
                 .orElseThrow(() -> new IllegalArgumentException("Estado no encontrado"));
 
@@ -112,35 +136,44 @@ public class DocumentoService implements DocumetoServiceInterface {
         documentoRepository.save(documentoEntity);
     }
 
+
     // Method to list documents by aspirant's email
     public List<DocumentoEntity> listarDocumentosPorAspirante(String email) {
-        Optional<AspiranteEntity> aspirante = aspiranteRepository.findByEmail(email);
-        if (!aspirante.isPresent()) {
-            throw new IllegalArgumentException("Usuario no encontrado");
-        }
-        return documentoRepository.findByAspiranteId(aspirante.get().getId());
+        AspiranteEntity aspirante = aspiranteRepository.findByCorreoPersonal(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        return documentoRepository.findByAspiranteId(aspirante.getId());
     }
+
+
 
 
     // Method to list documents for a specific aspirant by ID
     public List<DocumentoEntity> listarDocumentosDeAspirante(Integer aspiranteId) {
-        aspiranteRepository.findById(aspiranteId)
+        AspiranteEntity aspirante = aspiranteRepository.findById(aspiranteId)
                 .orElseThrow(() -> new IllegalArgumentException("Aspirante no encontrado"));
-        return documentoRepository.findByAspiranteId(aspiranteId);
+
+        return documentoRepository.findByAspiranteId(aspirante.getId());
     }
+
 
 
     // Method to send feedback for a document
     public void EnviarRetroalimentacion(Integer aspiranteId, Integer docId, String retroalimentacion) {
         DocumentoEntity documentoEntity = documentoRepository.findById(docId)
                 .orElseThrow(() -> new IllegalArgumentException("Documento no encontrado"));
-        EstadoDocEntity estadoRechazado = estadoDocRepository.findById(3) // Assuming 3 is the ID for "Rejected" state
-                .orElseThrow(() -> new IllegalArgumentException("Estado rechazado no encontrado"));
+
+        if (!documentoEntity.getAspirante().getId().equals(aspiranteId)) {
+            throw new IllegalArgumentException("El documento no pertenece al aspirante especificado.");
+        }
+
+        EstadoDocEntity estadoRechazado = estadoDocRepository.findByNombre("Rejected");
 
         documentoEntity.setEstado(estadoRechazado);
         documentoEntity.setRetroalimentacion(retroalimentacion);
         documentoRepository.save(documentoEntity);
     }
+
 
 
     // Method to list aspirants with a specific document state
@@ -166,6 +199,8 @@ public class DocumentoService implements DocumetoServiceInterface {
         AspiranteEntity aspirante = aspiranteRepository.findById(aspiranteId)
                 .orElseThrow(() -> new IllegalArgumentException("Aspirante no encontrado"));
 
+        EstadoDocEntity estadoInicial = estadoDocRepository.findByNombre("Pending");
+
         List<TipoDocumentoEntity> tiposDocumentos = tipoDocumentoRepository.findAll();
         List<DocumentoEntity> documentos = new ArrayList<>();
 
@@ -173,14 +208,14 @@ public class DocumentoService implements DocumetoServiceInterface {
             DocumentoEntity documento = new DocumentoEntity();
             documento.setAspirante(aspirante);
             documento.setDocumento(tipoDocumento);
-            documento.setEstado(estadoDocRepository.findById(1) // Assuming 1 is the ID for "Pending" state
-                    .orElseThrow(() -> new IllegalArgumentException("Estado inicial no encontrado")));
+            documento.setEstado(estadoInicial);
             documentoRepository.save(documento);
             documentos.add(documento);
         }
 
         return documentos;
     }
+
 
     // Method to list files of an aspirant
     public List<DocumentoResponse> listFiles(Integer aspiranteId) {

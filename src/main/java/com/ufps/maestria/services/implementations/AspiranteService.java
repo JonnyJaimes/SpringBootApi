@@ -158,17 +158,22 @@ public class AspiranteService implements AspiranteServiceInterface {
      */
     @Override
     public void disableAspirante(String email) {
-        AspiranteEntity aspiranteEntity = aspiranteRepository.findByCorreoPersonal(email);
-        if (aspiranteEntity == null) {
+        Optional<AspiranteEntity> aspiranteEntityOptional = aspiranteRepository.findByCorreoPersonal(email);
+
+        if (!aspiranteEntityOptional.isPresent()) {
             throw new UsernameNotFoundException("Aspirante con el email " + email + " no fue encontrado");
         }
+
+        AspiranteEntity aspiranteEntity = aspiranteEntityOptional.get();
         aspiranteEntity.setEstado(estadoRepository.findByDescripcion("DESACTIVADO"));
+
         try {
             aspiranteRepository.save(aspiranteEntity);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al desactivar aspirante");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al desactivar aspirante", e);
         }
     }
+
 
     /**
      * Este método se encarga de activar un aspirante en la base de datos
@@ -182,16 +187,23 @@ public class AspiranteService implements AspiranteServiceInterface {
      */
     @Override
     public void enableAspirante(String email) {
-        AspiranteEntity applicantEntity = aspiranteRepository.findByCorreoPersonal(email);
-        if (applicantEntity == null)
+        Optional<AspiranteEntity> applicantEntityOptional = aspiranteRepository.findByCorreoPersonal(email);
+
+        if (!applicantEntityOptional.isPresent()) {
             throw new UsernameNotFoundException("Aspirante con el email " + email + " no fue encontrado");
-        applicantEntity.setEstado(estadoRepository.findById(1).get());
+        }
+
+        AspiranteEntity applicantEntity = applicantEntityOptional.get();
+        applicantEntity.setEstado(estadoRepository.findById(1).orElseThrow(() ->
+                new RuntimeException("Estado con ID 1 no encontrado")));
+
         try {
             aspiranteRepository.save(applicantEntity);
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al activar aspirante");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al activar aspirante", e);
         }
     }
+
 
     /**
      * Obtiene el aspirante a través del id de la cuenta.
@@ -337,7 +349,7 @@ public class AspiranteService implements AspiranteServiceInterface {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La cohorte no está habilitada");
         }
 
-        if (calificacionPrueba < 0 || calificacionPrueba > 40)
+        if (calificacionPrueba < 0 || calificacionPrueba > 50)
             throw new IllegalArgumentException("La calificacion de la prueba no es valida");
 
         if (cohorteEntity.getEnlace_prueba() == null || cohorteEntity.getFechaMaxPrueba() == null)
@@ -457,12 +469,13 @@ public class AspiranteService implements AspiranteServiceInterface {
             throw new UsernameNotFoundException("No existe ningún aspirante asociado.");
         AspiranteEntity aspiranteEntity = aspirante.get();
 
-        if (aspiranteEntity.getEstado().getId() == 5) {
-            aspiranteEntity.setEstado(estadoRepository.findByDescripcion("ADMITIDO"));
+        if (aspiranteEntity.getEstado().getId() == 3 || aspiranteEntity.getEstado().getId() == 8) {
+            aspiranteEntity.setEstado(estadoRepository.findByDescripcion("Admitted"));
             aspiranteRepository.save(aspiranteEntity);
-        } else
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "El aspirante no se encuentra en el estado correcto para la admisión.");
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El aspirante no se encuentra en el estado correcto para la admisión.");
+        }
+
         notificacionService.crearNotificacion("Haz sido admitido a la maestria", aspiranteEntity.getId());
     }
 
@@ -589,11 +602,11 @@ public class AspiranteService implements AspiranteServiceInterface {
 
     @Override
     public AspiranteDTO editAspirante(Integer id, AspiranteDTO aspiranteDTO) {
-        // Fetch the existing aspirant record by ID
+        // Buscar el aspirante existente por ID
         AspiranteEntity existingAspirante = aspiranteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Aspirante not found"));
 
-        // Update fields based on the provided DTO
+        // Actualizar los campos del aspirante usando los datos proporcionados en el DTO
         existingAspirante.setNombre(aspiranteDTO.getNombre());
         existingAspirante.setApellido(aspiranteDTO.getApellido());
         existingAspirante.setGenero(aspiranteDTO.getGenero());
@@ -623,10 +636,16 @@ public class AspiranteService implements AspiranteServiceInterface {
         existingAspirante.setPuntaje_prueba(aspiranteDTO.getPuntaje_prueba());
         existingAspirante.setFecha_entrevista(aspiranteDTO.getFecha_entrevista());
 
-        // Save the updated aspirant record
+        // Actualizar el estado si se proporciona en el DTO
+        if (aspiranteDTO.getEstadoId() != null) {
+            existingAspirante.setEstado(estadoRepository.findById(aspiranteDTO.getEstadoId())
+                    .orElseThrow(() -> new RuntimeException("Estado not found")));
+        }
+
+        // Guardar los cambios en la base de datos
         AspiranteEntity updatedAspirante = aspiranteRepository.save(existingAspirante);
 
-        // Convert the updated entity back to DTO and return it
+        // Convertir la entidad actualizada a DTO y retornarla
         return convertToDTO(updatedAspirante);
     }
 

@@ -157,12 +157,13 @@ public class AspiranteEntity implements Serializable {
     private EstadoEntity estado;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "aspirante", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "aspirante", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DocumentoEntity> documentos = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "aspirante", orphanRemoval = true)
-    private List<NotificacionEntity> notificaciones = new ArrayList<>();
+    @OneToMany(mappedBy = "aspirante", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<NotificacionEntity> notificaciones;
+
 
     public Double getTotal() {
         if (getPuntajeDocumentos() == null) setPuntajeDocumentos(0d);

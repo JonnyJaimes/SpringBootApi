@@ -1,6 +1,7 @@
 package com.bezkoder.springjwt.controllers;
 
 
+import com.bezkoder.springjwt.dto.DocumentoDTO;
 import com.bezkoder.springjwt.payload.response.DocumentoResponse;
 
 import com.bezkoder.springjwt.services.implementations.DocumentoService;
@@ -25,6 +26,21 @@ public class DocumentosController {
 
     @Autowired
     private DocumentoService documentoService;  // Assuming a service for handling documents
+
+    @PreAuthorize("hasRole('USUARIO')")
+    @PostMapping("/uploadFile/{aspiranteId}/{tipoDocumento}")
+    public ResponseEntity<?> uploadFile(@PathVariable Integer aspiranteId,
+                                        @PathVariable String tipoDocumento,
+                                        @RequestParam("file") MultipartFile file) {
+        try {
+            DocumentoDTO documentoDTO = documentoService.subirDocumento(aspiranteId, tipoDocumento, file);
+            return ResponseEntity.ok(documentoDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
+    }
+
+
 
     @GetMapping("/listFiles/{idAspirante}")
     public ResponseEntity<List<DocumentoResponse>> listarDocumentosAspirante(@PathVariable Integer idAspirante) {
@@ -58,7 +74,22 @@ public class DocumentosController {
     public ResponseEntity<String> uploadFile(@PathVariable("tipoDocumento") int tipoDocumento,
                                              @RequestParam("file") MultipartFile file) {
         try {
+            // Check if file is empty
+            if (file.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please select a file to upload.");
+            }
+
+            // Log the file details
+            System.out.println("Uploading file: " + file.getOriginalFilename());
+
+            // Validate tipoDocumento
+            if (tipoDocumento <= 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid document type.");
+            }
+
+            // Upload the file
             String filePath = documentoService.uploadFile(tipoDocumento, file);
+
             return ResponseEntity.ok("File uploaded successfully to path: " + filePath);
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,4 +99,5 @@ public class DocumentosController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error: " + e.getMessage());
         }
     }
+
 }

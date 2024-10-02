@@ -89,10 +89,10 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()  // Authentication endpoints
                         .requestMatchers("/api/test/**").permitAll()  // Public test endpoints
-                        .requestMatchers("/api/v1/aspirante").hasRole("USER")  // Endpoints accessible by USER role
+                        .requestMatchers("/api/v1/aspirante", "/api/v1/documentos/uploadFile/{tipoDocumento}","/api/v1/documentos/uploadFile/{aspiranteId}/{tipoDocumento}").hasRole("USER")  // Endpoints accessible by USER role
                         .requestMatchers(
                                 "/api/v1/aspirante/all",
-                                "/api/v1/aspirante/admin/edit/{id}",
+                                "/api/v1/aspirante/aspirante/edit/{id}",
                                 "/api/v1/aspirante/admin/delete/{id}",
                                 "/api/v1/aspirante/cohorte/{cohorteId}",
                                 "/api/v1/aspirante/cambiarEsEgresado",
@@ -115,9 +115,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                         ).hasAnyRole("ADMIN", "MODERATOR")  // Admin and Moderator specific endpoints
                         .requestMatchers(
                                 "/api/v1/cohorte/**",
-                                "/api/v1/documentos/**",
                                 "/api/v1/documentosEstados/**"
-                        ).hasAnyRole("ADMIN", "MODERATOR", "USER")  // Include new controller endpoints
+                        ).hasAnyRole("ADMIN", "MODERATOR")  // Include new controller endpoints
                         .anyRequest().authenticated()  // All other endpoints require authentication
                 );
 

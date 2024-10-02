@@ -6,6 +6,7 @@ import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 import com.bezkoder.springjwt.services.interfaces.UserServiceInterface;
 
 
+import org.hibernate.Hibernate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,7 @@ import com.bezkoder.springjwt.models.Role;
 import com.bezkoder.springjwt.models.ERole;
 
 import com.bezkoder.springjwt.repository.RoleRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 
@@ -55,9 +57,10 @@ public class UserService implements UserServiceInterface {
     }
 
     // Get all users
-    @Override
+    @Transactional
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
+        users.forEach(user -> Hibernate.initialize(user.getRoles())); // Initialize roles
         return users.stream()
                 .map(user -> {
                     UserDTO userDTO = new UserDTO();
@@ -65,10 +68,7 @@ public class UserService implements UserServiceInterface {
                     userDTO.setUsername(user.getUsername());
                     userDTO.setEmail(user.getEmail());
                     userDTO.setEnabled(user.isEnabled());
-                    userDTO.setVerificationToken(user.getVerificationToken());
-                    userDTO.setTokenExpiryTime(user.getTokenExpiryTime());
 
-                    // Asignando los roles al UserDTO
                     Set<String> roles = user.getRoles().stream()
                             .map(role -> role.getName().name())
                             .collect(Collectors.toSet());
@@ -78,6 +78,8 @@ public class UserService implements UserServiceInterface {
                 })
                 .collect(Collectors.toList());
     }
+
+
 
 
     // Create User
