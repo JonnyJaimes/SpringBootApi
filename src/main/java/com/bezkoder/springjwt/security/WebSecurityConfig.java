@@ -80,22 +80,53 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 //
 //    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 //  }
-  
-  @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http.csrf(csrf -> csrf.disable())
-        .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(auth -> 
-          auth.requestMatchers("/api/auth/**").permitAll()
-              .requestMatchers("/api/test/**").permitAll()
-              .anyRequest().authenticated()
-        );
-    
-    http.authenticationProvider(authenticationProvider());
 
-    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-    
-    return http.build();
-  }
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()  // Authentication endpoints
+                        .requestMatchers("/api/test/**").permitAll()  // Public test endpoints
+                        .requestMatchers("/api/v1/aspirante").hasRole("USER")  // Endpoints accessible by USER role
+                        .requestMatchers(
+                                "/api/v1/aspirante/all",
+                                "/api/v1/aspirante/admin/edit/{id}",
+                                "/api/v1/aspirante/admin/delete/{id}",
+                                "/api/v1/aspirante/cohorte/{cohorteId}",
+                                "/api/v1/aspirante/cambiarEsEgresado",
+                                "/api/v1/aspirante/rechazarAdmision",
+                                "/api/v1/aspirante/{aspiranteId}/calificaciones",
+                                "/api/v1/aspirante/{aspiranteId}/admitir",
+                                "/api/v1/aspirante/calificarPrueba",
+                                "/api/v1/aspirante/habilitarFechaEntrevista",
+                                "/api/v1/aspirante/desactivar",
+                                "/api/v1/aspirante/activar"
+                        ).hasAnyRole("ADMIN", "MODERATOR")  // Endpoints accessible by ADMIN and MODERATOR
+                        .requestMatchers(
+                                "/api/admin",
+                                "/api/admin/edit/{id}",
+                                "/api/admin/delete/{id}",
+                                "/api/admin/users",
+                                "/api/admin/aspirantes",
+                                "/api/admin/logout",
+                                "/api/admin/obtenerAspirantesHistoricos"
+                        ).hasAnyRole("ADMIN", "MODERATOR")  // Admin and Moderator specific endpoints
+                        .requestMatchers(
+                                "/api/v1/cohorte/**",
+                                "/api/v1/documentos/**",
+                                "/api/v1/documentosEstados/**"
+                        ).hasAnyRole("ADMIN", "MODERATOR", "USER")  // Include new controller endpoints
+                        .anyRequest().authenticated()  // All other endpoints require authentication
+                );
+
+        http.authenticationProvider(authenticationProvider());
+
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+
 }
