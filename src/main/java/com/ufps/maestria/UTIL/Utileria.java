@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.UTIL;
+package com.ufps.maestria.UTIL;
 
 import org.springframework.web.multipart.MultipartFile;
 

@@ -1,8 +1,8 @@
-package com.bezkoder.springjwt.services.interfaces;
+package com.ufps.maestria.services.interfaces;
 
-import com.bezkoder.springjwt.dto.AspiranteDTO;
-import com.bezkoder.springjwt.dto.UserDTO;
-import com.bezkoder.springjwt.payload.response.AspiranteCohorteResponse;
+import com.ufps.maestria.dto.AspiranteDTO;
+import com.ufps.maestria.dto.UserDTO;
+import com.ufps.maestria.payload.response.AspiranteCohorteResponse;
 
 import java.time.LocalDateTime;
 import java.util.List;

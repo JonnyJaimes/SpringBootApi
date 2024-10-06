@@ -1,6 +1,6 @@
-package com.bezkoder.springjwt.repository;
+package com.ufps.maestria.repository;
 
-import com.bezkoder.springjwt.models.EstadoHistorialEntity;
+import com.ufps.maestria.models.EstadoHistorialEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

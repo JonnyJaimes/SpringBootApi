@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.models;
+package com.ufps.maestria.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,14 +41,14 @@ public class CohorteEntity implements Serializable {
      */
     @Column(name = "fecha_inicio",nullable = false)
     @NotNull(message = "La fecha de inicio no puede estar vacía")
-    private Date fechaInicio;
+    private LocalDate fechaInicio;
 
     /**
      * Fecha de finalización de la cohorte
      */
     @Column(name = "fecha_fin",nullable = false)
     @NotNull(message = "La fecha de inicio no puede estar vacía")
-    private Date fechaFin;
+    private LocalDate fechaFin;
 
     /**
      * La cohorte esta habilitada

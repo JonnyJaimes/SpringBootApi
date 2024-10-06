@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.models;
+package com.ufps.maestria.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -34,10 +34,8 @@ public class TipoDocumentoEntity implements Serializable {
     /**
      * Nombre del tipo de documento
      */
-    @Column(nullable = false, length = 255)
-    @NotEmpty
+    @Column(name = "nombre", nullable = false, length = 50)
     private String nombre;
-
     /**
      * url del formato institucional para llenar de forma correcta la información (opcional)
      */

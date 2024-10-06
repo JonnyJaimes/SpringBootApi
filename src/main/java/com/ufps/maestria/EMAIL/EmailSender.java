@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.EMAIL;
+package com.ufps.maestria.EMAIL;
 
 public interface EmailSender {
 

@@ -1,10 +1,15 @@
-package com.bezkoder.springjwt.controllers;
+package com.ufps.maestria.controllers;
 
 
-import com.bezkoder.springjwt.dto.DocumentoDTO;
-import com.bezkoder.springjwt.payload.response.DocumentoResponse;
+import com.ufps.maestria.dto.AspiranteDTO;
+import com.ufps.maestria.dto.DocumentoDTO;
+import com.ufps.maestria.models.EstadoEntity;
+import com.ufps.maestria.payload.response.DocumentoResponse;
 
-import com.bezkoder.springjwt.services.implementations.DocumentoService;
+import com.ufps.maestria.repository.DocumentoRepository;
+import com.ufps.maestria.repository.EstadoRepository;
+import com.ufps.maestria.services.implementations.AspiranteService;
+import com.ufps.maestria.services.implementations.DocumentoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +30,16 @@ import java.util.List;
 public class DocumentosController {
 
     @Autowired
-    private DocumentoService documentoService;  // Assuming a service for handling documents
+    private DocumentoService documentoService;
+
+    @Autowired
+    private AspiranteService aspiranteService;
+
+    @Autowired
+        private EstadoRepository estadoRepository;
+
+    @Autowired
+    private DocumentoRepository documentoRepository;// Assuming a service for handling documents
 
     @PreAuthorize("hasRole('USUARIO')")
     @PostMapping("/uploadFile/{aspiranteId}/{tipoDocumento}")
@@ -33,13 +47,26 @@ public class DocumentosController {
                                         @PathVariable String tipoDocumento,
                                         @RequestParam("file") MultipartFile file) {
         try {
+            AspiranteDTO aspirante = aspiranteService.getAspiranteByAspiranteId(aspiranteId);
+
+            // Check if the aspirant is in the required state (e.g., ID 2 for 'Documentos Recibidos')
+            if (aspirante.getEstadoId() != 2) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Aspirant must be in 'Documentos Recibidos' state to upload documents.");
+            }
+
+            // Check file count
+            int fileCount = documentoRepository.countByAspirante_Id(aspiranteId);
+            if (fileCount >= 5) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Maximum upload limit of 5 files reached.");
+            }
+
+            // Upload the document
             DocumentoDTO documentoDTO = documentoService.subirDocumento(aspiranteId, tipoDocumento, file);
             return ResponseEntity.ok(documentoDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
-
 
 
     @GetMapping("/listFiles/{idAspirante}")

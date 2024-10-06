@@ -1,14 +1,14 @@
-package com.bezkoder.springjwt.controllers;
+package com.ufps.maestria.controllers;
 
-import com.bezkoder.springjwt.dto.AspiranteDTO;
-import com.bezkoder.springjwt.dto.UserDTO;
+import com.ufps.maestria.dto.AspiranteDTO;
+import com.ufps.maestria.dto.UserDTO;
 
-import com.bezkoder.springjwt.payload.request.AspiranteEntrevistaRequest;
-import com.bezkoder.springjwt.payload.response.CalificacionesResponse;
+import com.ufps.maestria.payload.request.AspiranteEntrevistaRequest;
+import com.ufps.maestria.payload.response.CalificacionesResponse;
 
-import com.bezkoder.springjwt.security.services.UserDetailsImpl;
+import com.ufps.maestria.security.services.UserDetailsImpl;
 
-import com.bezkoder.springjwt.services.interfaces.AspiranteServiceInterface;
+import com.ufps.maestria.services.interfaces.AspiranteServiceInterface;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,11 +46,10 @@ public class AspiranteController {
         }
     }
 
-    @GetMapping("/miPerfil")
-    public ResponseEntity<AspiranteDTO> obtenerMiAspirante(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    @GetMapping("/miPerfil/{aspiranteId}")
+    public ResponseEntity<AspiranteDTO> obtenerMiAspirante(@PathVariable Integer aspiranteId) {
         try {
-            String email = userDetails.getEmail();
-            AspiranteDTO aspirante = aspiranteService.getAspiranteByEmail(email);
+            AspiranteDTO aspirante = aspiranteService.getAspiranteByAspiranteId(aspiranteId);
             return new ResponseEntity<>(aspirante, HttpStatus.OK);
         } catch (UsernameNotFoundException ex) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

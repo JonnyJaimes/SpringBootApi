@@ -1,8 +1,8 @@
-package com.bezkoder.springjwt.security;
+package com.ufps.maestria.security;
 
-import com.bezkoder.springjwt.models.ERole;
-import com.bezkoder.springjwt.models.Role;
-import com.bezkoder.springjwt.repository.RoleRepository;
+import com.ufps.maestria.models.ERole;
+import com.ufps.maestria.models.Role;
+import com.ufps.maestria.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

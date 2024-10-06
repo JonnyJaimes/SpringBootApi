@@ -1,7 +1,7 @@
-package com.bezkoder.springjwt.repository;
+package com.ufps.maestria.repository;
 
 
-import com.bezkoder.springjwt.models.CohorteEntity;
+import com.ufps.maestria.models.CohorteEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -55,4 +55,6 @@ public interface CohorteRepository extends JpaRepository<CohorteEntity, Integer>
      * @return un obejeto CohorteEntity con la cohorte que tenga esa id, en caso contrario retorna null 
      */
     Optional<CohorteEntity> findById(Integer id);
+
+
 }

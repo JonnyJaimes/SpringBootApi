@@ -1,9 +1,10 @@
-package com.bezkoder.springjwt.services.implementations;
-import com.bezkoder.springjwt.dto.UserDTO;
-import com.bezkoder.springjwt.models.User;
-import com.bezkoder.springjwt.repository.UserRepository;
-import com.bezkoder.springjwt.security.services.UserDetailsImpl;
-import com.bezkoder.springjwt.services.interfaces.UserServiceInterface;
+package com.ufps.maestria.services.implementations;
+import com.ufps.maestria.dto.UserDTO;
+import com.ufps.maestria.dto.UserDTO2;
+import com.ufps.maestria.models.User;
+import com.ufps.maestria.repository.UserRepository;
+import com.ufps.maestria.security.services.UserDetailsImpl;
+import com.ufps.maestria.services.interfaces.UserServiceInterface;
 
 
 import org.hibernate.Hibernate;
@@ -12,13 +13,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.bezkoder.springjwt.models.Role;
-import com.bezkoder.springjwt.models.ERole;
+import com.ufps.maestria.models.Role;
+import com.ufps.maestria.models.ERole;
 
-import com.bezkoder.springjwt.repository.RoleRepository;
+import com.ufps.maestria.repository.RoleRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
@@ -108,6 +110,42 @@ public class UserService implements UserServiceInterface {
         user.setRoles(roles);
         userRepository.save(user);
     }
+
+    @Override
+    public void createUser2(UserDTO userDTO) {
+        if (userRepository.existsByUsername(userDTO.getUsername()) || userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new RuntimeException("Username or Email already exists.");
+        }
+
+        User user = new User(userDTO.getUsername(), userDTO.getEmail(), passwordEncoder.encode(userDTO.getPassword()));
+
+        // Assign roles
+        Set<Role> roles = new HashSet<>();
+        if (userDTO.getRoles() != null && !userDTO.getRoles().isEmpty()) {
+            userDTO.getRoles().forEach(roleName -> {
+                try {
+                    // Convert role name to the expected ERole format
+                    String formattedRoleName = "ROLE_" + roleName.toUpperCase();
+                    Role role = roleRepository.findByName(ERole.valueOf(formattedRoleName))
+                            .orElseThrow(() -> new RuntimeException("Error: Role " + formattedRoleName + " is not found."));
+                    roles.add(role);
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("Error: Invalid role " + roleName);
+                }
+            });
+        } else {
+            // If no roles are specified, assign the default USER role
+            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+                    .orElseThrow(() -> new RuntimeException("Error: Role USER is not found."));
+            roles.add(userRole);
+        }
+
+        user.setRoles(roles);
+        userRepository.save(user);
+    }
+
+
+
 
     // Get Users by Role
     @Override

@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.models;
+package com.ufps.maestria.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

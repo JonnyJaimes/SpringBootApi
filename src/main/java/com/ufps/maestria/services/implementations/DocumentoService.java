@@ -1,19 +1,19 @@
-package com.bezkoder.springjwt.services.implementations;
+package com.ufps.maestria.services.implementations;
 
-
-import com.bezkoder.springjwt.UTIL.Utileria;
-import com.bezkoder.springjwt.dto.DocumentoDTO;
-import com.bezkoder.springjwt.models.AspiranteEntity;
-import com.bezkoder.springjwt.models.DocumentoEntity;
-import com.bezkoder.springjwt.models.EstadoDocEntity;
-import com.bezkoder.springjwt.models.TipoDocumentoEntity;
-import com.bezkoder.springjwt.payload.response.AspiranteEstadoDocResponse;
-import com.bezkoder.springjwt.payload.response.DocumentoResponse;
-import com.bezkoder.springjwt.repository.AspiranteRepository;
-import com.bezkoder.springjwt.repository.DocumentoRepository;
-import com.bezkoder.springjwt.repository.EstadoDocRepository;
-import com.bezkoder.springjwt.repository.TipoDocumentoRepository;
-import com.bezkoder.springjwt.services.interfaces.DocumetoServiceInterface;
+import com.ufps.maestria.UTIL.Utileria;
+import com.ufps.maestria.dto.DocumentoDTO;
+import com.ufps.maestria.models.AspiranteEntity;
+import com.ufps.maestria.models.DocumentoEntity;
+import com.ufps.maestria.models.EstadoDocEntity;
+import com.ufps.maestria.models.TipoDocumentoEntity;
+import com.ufps.maestria.payload.response.AspiranteEstadoDocResponse;
+import com.ufps.maestria.payload.response.DocumentoResponse;
+import com.ufps.maestria.repository.AspiranteRepository;
+import com.ufps.maestria.repository.DocumentoRepository;
+import com.ufps.maestria.repository.EstadoDocRepository;
+import com.ufps.maestria.repository.TipoDocumentoRepository;
+import com.ufps.maestria.services.interfaces.DocumetoServiceInterface;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,10 +25,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.bezkoder.springjwt.UTIL.Utileria.obtenerExtensionArchivo;
+import static com.ufps.maestria.UTIL.Utileria.obtenerExtensionArchivo;
 
 
 @Service
@@ -46,16 +45,17 @@ public class DocumentoService implements DocumetoServiceInterface {
     @Autowired
     private AspiranteRepository aspiranteRepository;
 
+
+
+
     @Value("${local.storage.basepath}")
     private String storageBasePath;
 
     @Override
     public DocumentoDTO subirDocumento(Integer aspiranteId, String tipoDocumento, MultipartFile file) {
         // Buscar el tipo de documento
-        TipoDocumentoEntity tipoDocEntity = tipoDocumentoRepository.findByNombre(tipoDocumento);
-        if (tipoDocEntity == null) {
-            throw new IllegalArgumentException("Tipo de documento no encontrado.");
-        }
+        TipoDocumentoEntity tipoDocEntity = tipoDocumentoRepository.findByNombre(tipoDocumento)
+                .orElseThrow(() -> new IllegalArgumentException("Tipo de documento no encontrado."));
 
         // Guardar archivo en el sistema de archivos
         String archivoUrl = Utileria.guardarArchivo(file, storageBasePath);
@@ -84,15 +84,13 @@ public class DocumentoService implements DocumetoServiceInterface {
     }
 
 
-
-
     @Override
     public List<DocumentoResponse> listarDocumentos(Integer aspiranteId) {
         // Check if aspirante exists
         aspiranteRepository.findById(aspiranteId)
                 .orElseThrow(() -> new IllegalArgumentException("Aspirante no encontrado"));
 
-        List<DocumentoEntity> documentos = documentoRepository.findByAspiranteId(aspiranteId);
+        List<DocumentoEntity> documentos = documentoRepository.findByAspirante_Id(aspiranteId);
         return documentos.stream()
                 .map(doc -> new DocumentoResponse(doc.getEstado(), doc.getDocumento(), doc.getFormato(), doc.getUrl()))
                 .collect(Collectors.toList());
@@ -100,27 +98,16 @@ public class DocumentoService implements DocumetoServiceInterface {
 
 
     @Override
-    public void cambiarEstadoDocumento(Integer documentoId, String nuevoEstado) {
-        DocumentoEntity documento = documentoRepository.findById(documentoId)
-                .orElseThrow(() -> new IllegalArgumentException("Documento no encontrado"));
-
-        EstadoDocEntity estadoDoc = estadoDocRepository.findByNombre(nuevoEstado);
-        if (estadoDoc == null) {
-            throw new IllegalArgumentException("Estado no encontrado: " + nuevoEstado);
-        }
-
-        documento.setEstado(estadoDoc);
-        documentoRepository.save(documento);
-
-        // Optional: Implement and call the notification logic here
-        enviarNotificacion(documento.getAspirante().getId(), estadoDoc.getNombre());
+    public int countFilesByAspiranteId(Integer aspiranteId) {
+        return documentoRepository.countByAspirante_Id(aspiranteId);
     }
-
-
 
     private void enviarNotificacion(Integer aspiranteId, String estadoDocumento) {
         // Implementar lógica para enviar notificación
     }
+
+
+    @Override
     public void cambiarEstadoDocumento(Integer aspiranteId, Integer documentoId, Integer nuevoEstadoId) {
         DocumentoEntity documentoEntity = documentoRepository.findById(documentoId)
                 .orElseThrow(() -> new IllegalArgumentException("Documento no encontrado"));
@@ -138,27 +125,26 @@ public class DocumentoService implements DocumetoServiceInterface {
 
 
     // Method to list documents by aspirant's email
+
+    @Override
     public List<DocumentoEntity> listarDocumentosPorAspirante(String email) {
         AspiranteEntity aspirante = aspiranteRepository.findByCorreoPersonal(email)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        return documentoRepository.findByAspiranteId(aspirante.getId());
+        return documentoRepository.findByAspirante_Id(aspirante.getId());
     }
 
-
-
-
-    // Method to list documents for a specific aspirant by ID
+    @Override
     public List<DocumentoEntity> listarDocumentosDeAspirante(Integer aspiranteId) {
         AspiranteEntity aspirante = aspiranteRepository.findById(aspiranteId)
                 .orElseThrow(() -> new IllegalArgumentException("Aspirante no encontrado"));
 
-        return documentoRepository.findByAspiranteId(aspirante.getId());
+        return documentoRepository.findByAspirante_Id(aspirante.getId());
     }
 
-
-
     // Method to send feedback for a document
+
+    @Override
     public void EnviarRetroalimentacion(Integer aspiranteId, Integer docId, String retroalimentacion) {
         DocumentoEntity documentoEntity = documentoRepository.findById(docId)
                 .orElseThrow(() -> new IllegalArgumentException("Documento no encontrado"));
@@ -177,8 +163,9 @@ public class DocumentoService implements DocumetoServiceInterface {
 
 
     // Method to list aspirants with a specific document state
+    @Override
     public List<AspiranteEstadoDocResponse> listarAspirantesConEstadoDoc(Integer idEstado) {
-        List<DocumentoEntity> documentos = documentoRepository.findByEstadoId(idEstado);
+        List<DocumentoEntity> documentos = documentoRepository.findByEstado_Id(idEstado);
         return documentos.stream()
                 .map(doc -> {
                     AspiranteEstadoDocResponse response = new AspiranteEstadoDocResponse();
@@ -195,6 +182,7 @@ public class DocumentoService implements DocumetoServiceInterface {
 
 
     // Method to create documents for an aspirant
+    @Override
     public List<DocumentoEntity> crearDocumentos(Integer aspiranteId) {
         AspiranteEntity aspirante = aspiranteRepository.findById(aspiranteId)
                 .orElseThrow(() -> new IllegalArgumentException("Aspirante no encontrado"));
@@ -215,6 +203,25 @@ public class DocumentoService implements DocumetoServiceInterface {
 
         return documentos;
     }
+
+
+    @Override
+    public void cambiarEstadoDocumentoV2(Integer aspiranteId, Integer documentoId, Integer estadoId) {
+        DocumentoEntity documento = documentoRepository.findById(documentoId)
+                .orElseThrow(() -> new EntityNotFoundException("Documento no encontrado"));
+
+        if (!documento.getAspiranteId().equals(aspiranteId)) {
+            throw new IllegalArgumentException("El documento no pertenece al aspirante.");
+        }
+
+        EstadoDocEntity nuevoEstado = estadoDocRepository.findById(estadoId)
+                .orElseThrow(() -> new EntityNotFoundException("Estado no encontrado"));
+
+        // Set the new state
+        documento.setEstado(nuevoEstado);
+        documentoRepository.save(documento);
+    }
+
 
 
     // Method to list files of an aspirant

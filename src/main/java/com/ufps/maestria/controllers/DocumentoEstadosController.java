@@ -1,15 +1,15 @@
-package com.bezkoder.springjwt.controllers;
+package com.ufps.maestria.controllers;
 
 
-import com.bezkoder.springjwt.models.DocumentoEntity;
-import com.bezkoder.springjwt.payload.request.RetroAlimentacionRequest;
-import com.bezkoder.springjwt.payload.response.AspiranteEstadoDocResponse;
-import com.bezkoder.springjwt.payload.response.DocumentoUserResponse;
-import com.bezkoder.springjwt.payload.response.DocumentoResponse;
+import com.ufps.maestria.models.DocumentoEntity;
+import com.ufps.maestria.payload.request.RetroAlimentacionRequest;
+import com.ufps.maestria.payload.response.AspiranteEstadoDocResponse;
+import com.ufps.maestria.payload.response.DocumentoUserResponse;
+import com.ufps.maestria.payload.response.DocumentoResponse;
 
-import com.bezkoder.springjwt.repository.TipoDocumentoRepository;
-import com.bezkoder.springjwt.services.implementations.DocumentoService;
-import com.bezkoder.springjwt.services.implementations.NotificacionService;
+import com.ufps.maestria.repository.TipoDocumentoRepository;
+import com.ufps.maestria.services.implementations.DocumentoService;
+import com.ufps.maestria.services.implementations.NotificacionService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,30 +40,40 @@ public class DocumentoEstadosController {
     @Autowired
     private TipoDocumentoRepository tipoDocumentoRepository;
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ENCARGADO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
     @PutMapping("/aprobar/{documentoId}/{aspiranteId}")
     public ResponseEntity<String> aprobarDocumento(@PathVariable Integer documentoId, @PathVariable Integer aspiranteId) {
         try {
-            documentoService.cambiarEstadoDocumento(aspiranteId, documentoId, 2); // Assuming 2 is the ID for the "approved" state
+            // Get the ID for the "approved" state dynamically
+            Integer approvedStateId = tipoDocumentoRepository.findByNombre("Aprobado")
+                    .orElseThrow(() -> new EntityNotFoundException("Estado 'Aprobado' no encontrado.")).getId();
+
+            documentoService.cambiarEstadoDocumento(aspiranteId, documentoId, approvedStateId);
             return ResponseEntity.ok("Documento aprobado con éxito");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ENCARGADO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
     @PutMapping("/rechazar/{documentoId}/{aspiranteId}")
     public ResponseEntity<String> rechazarDocumento(@PathVariable Integer documentoId, @PathVariable Integer aspiranteId) {
         try {
-            documentoService.cambiarEstadoDocumento(aspiranteId, documentoId, 3); // Assuming 3 is the ID for the "rejected" state
+            // Get the ID for the "rejected" state dynamically
+            Integer rejectedStateId = tipoDocumentoRepository.findByNombre("Rechazado")
+                    .orElseThrow(() -> new EntityNotFoundException("Estado 'Rechazado' no encontrado.")).getId();
+
+            documentoService.cambiarEstadoDocumento(aspiranteId, documentoId, rejectedStateId);
             return ResponseEntity.ok("Documento rechazado con éxito");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
 
+
+
     @PreAuthorize("hasRole('USUARIO')")
-    @GetMapping("/listar")
+    @GetMapping("Aspirante/listar")
     public ResponseEntity<List<DocumentoUserResponse>> listarDocumentosPorAspirante() {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -86,8 +96,8 @@ public class DocumentoEstadosController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ENCARGADO')")
-    @GetMapping("/listarDoc")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
+    @GetMapping("Aspirantes/listarDoc")
     public ResponseEntity<List<DocumentoResponse>> listarDocumentosdeAspirante(@RequestParam("aspiranteId") Integer aspiranteId) {
         try {
             List<DocumentoEntity> documentos = documentoService.listarDocumentosDeAspirante(aspiranteId);
@@ -100,7 +110,7 @@ public class DocumentoEstadosController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ENCARGADO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
     @PostMapping("/retroalimentacion")
     public ResponseEntity<String> rechazaryEnviarRetroalimentacion(@RequestBody @Valid RetroAlimentacionRequest retroalimentacionRequest) {
         try {
@@ -120,7 +130,7 @@ public class DocumentoEstadosController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('ENCARGADO')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
     @GetMapping("/filtrar")
     public ResponseEntity<List<AspiranteEstadoDocResponse>> listarAspirantesConEstado(@RequestParam Integer idEstado) {
         try {

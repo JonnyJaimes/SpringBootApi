@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.models;
+package com.ufps.maestria.models;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -19,6 +19,9 @@ import lombok.Data;
       @UniqueConstraint(columnNames = "email") 
     })
 public class User {
+
+  private static final long serialVersionUID = 1L;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

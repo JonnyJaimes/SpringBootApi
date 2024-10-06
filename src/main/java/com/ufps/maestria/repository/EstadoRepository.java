@@ -1,12 +1,13 @@
-package com.bezkoder.springjwt.repository;
+package com.ufps.maestria.repository;
 
 
-import com.bezkoder.springjwt.models.AspiranteEntity;
-import com.bezkoder.springjwt.models.EstadoEntity;
+import com.ufps.maestria.models.AspiranteEntity;
+import com.ufps.maestria.models.EstadoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository que define los métodos para acceder al estado del Aspirante.
@@ -30,4 +31,7 @@ public interface EstadoRepository extends JpaRepository <EstadoEntity, Integer>{
      *         o una lista vacía si no se encuentran estados.
      */
     List<EstadoEntity> findByAspirante(AspiranteEntity aspirante);
+
+
+
 }

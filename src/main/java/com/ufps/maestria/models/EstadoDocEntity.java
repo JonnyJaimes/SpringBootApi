@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.models;
+package com.ufps.maestria.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter
@@ -33,4 +34,7 @@ public class EstadoDocEntity implements Serializable {
     @Column(nullable = false, length = 20)
     @NotEmpty
     private String nombre;
+
+    @OneToMany(mappedBy = "estado", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DocumentoEntity> documentos;
 }

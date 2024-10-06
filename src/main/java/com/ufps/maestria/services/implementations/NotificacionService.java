@@ -1,16 +1,16 @@
-package com.bezkoder.springjwt.services.implementations;
+package com.ufps.maestria.services.implementations;
 
 
-import com.bezkoder.springjwt.EMAIL.EmailServiceTODO;
-import com.bezkoder.springjwt.dto.NotificacionDTO;
-import com.bezkoder.springjwt.models.AspiranteEntity;
-import com.bezkoder.springjwt.models.CohorteEntity;
-import com.bezkoder.springjwt.models.NotificacionEntity;
-import com.bezkoder.springjwt.repository.AspiranteRepository;
-import com.bezkoder.springjwt.repository.CohorteRepository;
-import com.bezkoder.springjwt.repository.NotificacionRepository;
+import com.ufps.maestria.EMAIL.EmailServiceTODO;
+import com.ufps.maestria.dto.NotificacionDTO;
+import com.ufps.maestria.models.AspiranteEntity;
+import com.ufps.maestria.models.CohorteEntity;
+import com.ufps.maestria.models.NotificacionEntity;
+import com.ufps.maestria.repository.AspiranteRepository;
+import com.ufps.maestria.repository.CohorteRepository;
+import com.ufps.maestria.repository.NotificacionRepository;
 
-import com.bezkoder.springjwt.services.interfaces.NotificacionServiceInterface;
+import com.ufps.maestria.services.interfaces.NotificacionServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,0 +1,4 @@
+INSERT INTO aspirante 
+(cohorte_id, user_id, nombre, apellido, genero, lugar_nac, fecha_exp_di, fecha_nac, no_documento, correo_personal, departamento_residencia, municipio_residencia, direccion_residencia, telefono, empresa_trabajo, departamento_trabajo, municipio_trabajo, direccion_trabajo, estudios_pregrado, estudios_posgrados, exp_laboral, es_egresado_ufps, estado_id, puntaje_notas, puntajeDistincionesAcademicas, puntajeExperienciaLaboral, puntajePublicaciones, puntajeCartasReferencia, puntaje_entrevista, puntaje_prueba, fecha_entrevista)
+VALUES 
+(1, 1, 'Juan', 'Pérez', 'M', 'Bogotá', '2005-01-01', '1990-01-01', '1234567890', 'juanperez@example.com', 'Cundinamarca', 'Bogotá', 'Calle 123 #45-67', '3201234567', 'Compañía XYZ', 'Cundinamarca', 'Bogotá', 'Carrera 45 #67-89', 'Ingeniería de Sistemas', 'Maestría en Ciencias Computacionales', '5 años de experiencia', true, 1, 90, 4.0, 3.5, 2.0, 3, 10, 15, '2024-08-01 10:00:00');

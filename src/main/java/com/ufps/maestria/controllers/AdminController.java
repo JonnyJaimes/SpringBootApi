@@ -1,13 +1,12 @@
-package com.bezkoder.springjwt.controllers;
+package com.ufps.maestria.controllers;
 
 
-import com.bezkoder.springjwt.dto.AspiranteDTO;
-import com.bezkoder.springjwt.dto.UserDTO;
-import com.bezkoder.springjwt.models.User;
-import com.bezkoder.springjwt.services.implementations.AspiranteService;
-import com.bezkoder.springjwt.services.implementations.UserService;
-import com.bezkoder.springjwt.services.interfaces.UserServiceInterface;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ufps.maestria.dto.AspiranteDTO;
+import com.ufps.maestria.dto.UserDTO;
+import com.ufps.maestria.dto.UserDTO2;
+import com.ufps.maestria.models.User;
+import com.ufps.maestria.services.implementations.AspiranteService;
+import com.ufps.maestria.services.interfaces.UserServiceInterface;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,12 +25,23 @@ public class AdminController {
     private final AspiranteService aspiranteService;
 
 
-    // Constructor Injection
-
     public AdminController(UserServiceInterface userService, AspiranteService aspiranteService) {
         this.userService = userService;
         this.aspiranteService = aspiranteService;
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/create-user")
+    public ResponseEntity<?> createUser2(@RequestBody UserDTO userDTO) {
+        try {
+            userService.createUser2(userDTO);  // Use the service method to create the user
+            return new ResponseEntity<>("User created successfully.", HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error creating user: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
 
     // UserController.java
     @PutMapping("/edit/{id}")
@@ -46,7 +56,6 @@ public class AdminController {
     }
 
     // UserController.java
-
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")

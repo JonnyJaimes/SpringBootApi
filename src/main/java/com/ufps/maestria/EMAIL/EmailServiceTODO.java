@@ -1,6 +1,6 @@
-package com.bezkoder.springjwt.EMAIL;
+package com.ufps.maestria.EMAIL;
 
-import com.bezkoder.springjwt.security.services.EmailService;
+import com.ufps.maestria.security.services.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.validation.constraints.Email;

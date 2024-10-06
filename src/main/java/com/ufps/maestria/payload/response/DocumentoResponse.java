@@ -1,7 +1,7 @@
-package com.bezkoder.springjwt.payload.response;
+package com.ufps.maestria.payload.response;
 
-import com.bezkoder.springjwt.models.EstadoDocEntity;
-import com.bezkoder.springjwt.models.TipoDocumentoEntity;
+import com.ufps.maestria.models.EstadoDocEntity;
+import com.ufps.maestria.models.TipoDocumentoEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,13 +1,12 @@
-package com.bezkoder.springjwt.controllers;
+package com.ufps.maestria.controllers;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.bezkoder.springjwt.security.services.EmailService;
+import com.ufps.maestria.security.services.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -22,17 +21,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import com.bezkoder.springjwt.models.ERole;
-import com.bezkoder.springjwt.models.Role;
-import com.bezkoder.springjwt.models.User;
-import com.bezkoder.springjwt.payload.request.LoginRequest;
-import com.bezkoder.springjwt.payload.request.SignupRequest;
-import com.bezkoder.springjwt.payload.response.JwtResponse;
-import com.bezkoder.springjwt.payload.response.MessageResponse;
-import com.bezkoder.springjwt.repository.RoleRepository;
-import com.bezkoder.springjwt.repository.UserRepository;
-import com.bezkoder.springjwt.security.jwt.JwtUtils;
-import com.bezkoder.springjwt.security.services.UserDetailsImpl;
+import com.ufps.maestria.models.ERole;
+import com.ufps.maestria.models.Role;
+import com.ufps.maestria.models.User;
+import com.ufps.maestria.payload.request.LoginRequest;
+import com.ufps.maestria.payload.request.SignupRequest;
+import com.ufps.maestria.payload.response.JwtResponse;
+import com.ufps.maestria.payload.response.MessageResponse;
+import com.ufps.maestria.repository.RoleRepository;
+import com.ufps.maestria.repository.UserRepository;
+import com.ufps.maestria.security.jwt.JwtUtils;
+import com.ufps.maestria.security.services.UserDetailsImpl;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController

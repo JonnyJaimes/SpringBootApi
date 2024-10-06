@@ -1,8 +1,8 @@
-package com.bezkoder.springjwt.repository;
+package com.ufps.maestria.repository;
 
 
-import com.bezkoder.springjwt.models.AspiranteEntity;
-import com.bezkoder.springjwt.models.NotificacionEntity;
+import com.ufps.maestria.models.AspiranteEntity;
+import com.ufps.maestria.models.NotificacionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

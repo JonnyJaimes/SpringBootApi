@@ -1,8 +1,8 @@
-package com.bezkoder.springjwt.repository;
+package com.ufps.maestria.repository;
 
 
 
-import com.bezkoder.springjwt.models.DocumentoEntity;
+import com.ufps.maestria.models.DocumentoEntity;
 
 import java.io.File;
 import java.io.IOException;

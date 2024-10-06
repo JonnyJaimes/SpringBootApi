@@ -1,8 +1,8 @@
-package com.bezkoder.springjwt.services.interfaces;
+package com.ufps.maestria.services.interfaces;
 
 
 
-import com.bezkoder.springjwt.dto.TipoDocumentoDTO;
+import com.ufps.maestria.dto.TipoDocumentoDTO;
 
 import java.util.List;
 

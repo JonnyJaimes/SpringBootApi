@@ -1,6 +1,6 @@
-package com.bezkoder.springjwt.payload.response;
+package com.ufps.maestria.payload.response;
 
-import com.bezkoder.springjwt.models.EstadoEntity;
+import com.ufps.maestria.models.EstadoEntity;
 import lombok.Data;
 
 @Data

@@ -1,13 +1,12 @@
-package com.bezkoder.springjwt.services.interfaces;
+package com.ufps.maestria.services.interfaces;
 
-import com.bezkoder.springjwt.dto.DocumentoDTO;
-import com.bezkoder.springjwt.payload.response.DocumentoResponse;
-import org.springframework.core.io.Resource;
+import com.ufps.maestria.dto.DocumentoDTO;
+import com.ufps.maestria.models.DocumentoEntity;
+import com.ufps.maestria.payload.response.AspiranteEstadoDocResponse;
+import com.ufps.maestria.payload.response.DocumentoResponse;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Esta interfaz define los métodos necesarios para guardar, buscar y recuperar documentos.
@@ -15,8 +14,25 @@ import java.util.stream.Stream;
 public interface DocumetoServiceInterface {
 
     DocumentoDTO subirDocumento(Integer aspiranteId, String tipoDocumento, MultipartFile file);
+
     List<DocumentoResponse> listarDocumentos(Integer aspiranteId);
-    void cambiarEstadoDocumento(Integer documentoId, String nuevoEstado);
+
+    int countFilesByAspiranteId(Integer aspiranteId);
+
+    void cambiarEstadoDocumento(Integer aspiranteId, Integer documentoId, Integer estadoId);
+
+    public List<DocumentoEntity> listarDocumentosPorAspirante(String email);
+
+    public List<DocumentoEntity> listarDocumentosDeAspirante(Integer aspiranteId);
+
+    public void EnviarRetroalimentacion(Integer aspiranteId, Integer docId, String retroalimentacion);
+
+    public List<AspiranteEstadoDocResponse> listarAspirantesConEstadoDoc(Integer idEstado);
+
+    public List<DocumentoEntity> crearDocumentos(Integer aspiranteId);
+
+    public void cambiarEstadoDocumentoV2(Integer aspiranteId, Integer documentoId, Integer estadoId);
+
 
 
 

@@ -1,8 +1,7 @@
-package com.bezkoder.springjwt.security.services;
+package com.ufps.maestria.security.services;
 
-import com.bezkoder.springjwt.models.User;
+import com.ufps.maestria.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;

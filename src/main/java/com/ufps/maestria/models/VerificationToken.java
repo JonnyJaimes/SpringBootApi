@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.models;
+package com.ufps.maestria.models;
 
 import jakarta.persistence.*;
 
@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 
 @Entity
 public class VerificationToken {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

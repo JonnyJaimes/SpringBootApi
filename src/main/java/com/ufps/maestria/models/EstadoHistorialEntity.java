@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.models;
+package com.ufps.maestria.models;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 @Setter
 @Table(name = "EstadoHistorial")
 public class EstadoHistorialEntity {
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

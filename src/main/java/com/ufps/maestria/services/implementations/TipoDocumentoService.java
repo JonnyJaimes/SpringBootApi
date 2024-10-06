@@ -1,10 +1,10 @@
-package com.bezkoder.springjwt.services.implementations;
+package com.ufps.maestria.services.implementations;
 
 
-import com.bezkoder.springjwt.dto.TipoDocumentoDTO;
-import com.bezkoder.springjwt.models.TipoDocumentoEntity;
-import com.bezkoder.springjwt.repository.TipoDocumentoRepository;
-import com.bezkoder.springjwt.services.interfaces.TipoDocumentoServiceInterface;
+import com.ufps.maestria.dto.TipoDocumentoDTO;
+import com.ufps.maestria.models.TipoDocumentoEntity;
+import com.ufps.maestria.repository.TipoDocumentoRepository;
+import com.ufps.maestria.services.interfaces.TipoDocumentoServiceInterface;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

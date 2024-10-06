@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.dto;
+package com.ufps.maestria.dto;
 
 import lombok.Data;
 

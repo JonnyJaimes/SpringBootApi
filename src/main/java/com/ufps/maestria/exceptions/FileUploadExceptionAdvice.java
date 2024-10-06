@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.exceptions;
+package com.ufps.maestria.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

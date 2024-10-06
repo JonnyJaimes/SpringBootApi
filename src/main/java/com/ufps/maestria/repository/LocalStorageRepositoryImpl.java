@@ -1,7 +1,7 @@
-package com.bezkoder.springjwt.repository;
+package com.ufps.maestria.repository;
 
 
-import com.bezkoder.springjwt.models.DocumentoEntity;
+import com.ufps.maestria.models.DocumentoEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.services.interfaces;
+package com.ufps.maestria.services.interfaces;
 
 public interface JWTServiceInterface {
 /*

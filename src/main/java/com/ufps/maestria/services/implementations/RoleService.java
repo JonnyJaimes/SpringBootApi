@@ -1,8 +1,8 @@
-package com.bezkoder.springjwt.services.implementations;
+package com.ufps.maestria.services.implementations;
 
-import com.bezkoder.springjwt.models.ERole;
-import com.bezkoder.springjwt.models.Role;
-import com.bezkoder.springjwt.repository.RoleRepository;
+import com.ufps.maestria.models.ERole;
+import com.ufps.maestria.models.Role;
+import com.ufps.maestria.repository.RoleRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

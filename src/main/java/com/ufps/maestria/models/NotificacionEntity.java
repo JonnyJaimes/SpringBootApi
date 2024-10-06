@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.models;
+package com.ufps.maestria.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;

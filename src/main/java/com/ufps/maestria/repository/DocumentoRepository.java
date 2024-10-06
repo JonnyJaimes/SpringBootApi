@@ -1,10 +1,10 @@
-package com.bezkoder.springjwt.repository;
+package com.ufps.maestria.repository;
 
 
-import com.bezkoder.springjwt.models.AspiranteEntity;
-import com.bezkoder.springjwt.models.DocumentoEntity;
-import com.bezkoder.springjwt.models.EstadoDocEntity;
-import com.bezkoder.springjwt.models.TipoDocumentoEntity;
+import com.ufps.maestria.models.AspiranteEntity;
+import com.ufps.maestria.models.DocumentoEntity;
+import com.ufps.maestria.models.EstadoDocEntity;
+import com.ufps.maestria.models.TipoDocumentoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,71 +21,89 @@ import java.util.List;
 public interface DocumentoRepository extends JpaRepository<DocumentoEntity, Integer> {
 
     /**
-     * Buscar documentos por aspirante
-     * 
-     * @param aspirante que contiene el aspirante al que se le van a buscar los
-     *                  documentos
-     * @return un listado con los documentos del aspirante
+     * Buscar documentos por aspirante.
+     *
+     * @param aspirante El aspirante al que se le van a buscar los documentos.
+     * @return Un listado con los documentos del aspirante.
      */
     List<DocumentoEntity> findByAspirante(AspiranteEntity aspirante);
 
     /**
-     * Buscar documentos por id de tipo
-     * 
-     * @param tipo_documento_id contiene el id del tipo de documento a buscar
-     * @return un listado con los documentos que cumplan con el tipo a buscar
+     * Buscar documentos por ID de tipo de documento.
+     *
+     * @param tipoDocumentoId El ID del tipo de documento a buscar.
+     * @return Un listado con los documentos que cumplen con el tipo a buscar.
      */
-    List<DocumentoEntity> findByDocumentoId(TipoDocumentoEntity tipo_documento_id);
+    List<DocumentoEntity> findByDocumento_Id(Integer tipoDocumentoId);
 
     /**
-     * Buscar documentos por tipo
-     * 
-     * @param tipo_documento contiene el tipo de documento a buscar
-     * @return un listado con los documentos que cumplan con el tipo a buscar
+     * Buscar documentos por tipo.
+     *
+     * @param documento El tipo de documento a buscar.
+     * @return Un listado con los documentos que cumplen con el tipo a buscar.
      */
     List<DocumentoEntity> findByDocumento(TipoDocumentoEntity documento);
 
     /**
-     * Buscar documentos por tipo
-     * 
-     * @param tipo_documento contiene el tipo de documento a buscar
-     * @return un listado con los documentos que cumplan con el tipo a buscar
+     * Buscar documentos por aspirante y estado.
+     *
+     * @param aspirante El aspirante al que se le van a buscar los documentos.
+     * @param estado El estado de los documentos a buscar.
+     * @return Un listado con los documentos que cumplen con el aspirante y el estado.
      */
     List<DocumentoEntity> findByAspiranteAndEstado(AspiranteEntity aspirante, EstadoDocEntity estado);
 
     /**
      * Buscar un objeto DocumentoEntity por aspirante y tipo de documento.
      *
-     * @param idAspirante     el ID del aspirante para buscar el documento
-     * @param idTipoDocumento el ID del tipo de documento para buscar el documento
-     * @return un objeto DocumentoEntity que corresponde al aspirante y tipo de documento proporcionados,
-     * o null si no se encuentra ningún documento.
+     * @param idAspirante El ID del aspirante para buscar el documento.
+     * @param idTipoDocumento El ID del tipo de documento para buscar el documento.
+     * @return Un objeto DocumentoEntity que corresponde al aspirante y tipo de documento proporcionados.
      */
-    @Query(value = "SELECT * FROM documento D where D.documento_id = :idtipo_documento and D.aspirante_id = :idAspirante", nativeQuery = true)
-    DocumentoEntity findByAspiranteAndDocumento(@Param("idAspirante") Integer idAspirante,
-            @Param("idtipo_documento") Integer idTipoDocumento);
+    @Query(value = "SELECT * FROM documento D WHERE D.documento_id = :idtipo_documento AND D.aspirante_id = :idAspirante", nativeQuery = true)
+    DocumentoEntity findByAspiranteAndDocumento(@Param("idAspirante") Integer idAspirante, @Param("idtipo_documento") Integer idTipoDocumento);
 
     /**
      * Buscar documentos por estado y aspirante.
      *
-     * @param idEstado       el ID del estado del documento
-     * @param idAspirante    el ID del aspirante para buscar los documentos
-     * @return una lista de objetos DocumentoEntity que corresponden al estado y aspirante proporcionados,
-     *         o una lista vacía si no se encuentran documentos.
+     * @param idEstado El ID del estado del documento.
+     * @param idAspirante El ID del aspirante para buscar los documentos.
+     * @return Una lista de objetos DocumentoEntity que corresponden al estado y aspirante proporcionados.
      */
-    @Query(value = "SELECT * FROM documento D where D.estado_id = :idEstado and D.aspirante_id = :idAspirante", nativeQuery = true)
-    List<DocumentoEntity> findDocumentosByEstado(@Param("idEstado") Integer idEstado,
-            @Param("idAspirante") Integer idAspirante);
+    @Query(value = "SELECT * FROM documento D WHERE D.estado_id = :idEstado AND D.aspirante_id = :idAspirante", nativeQuery = true)
+    List<DocumentoEntity> findDocumentosByEstado(@Param("idEstado") Integer idEstado, @Param("idAspirante") Integer idAspirante);
 
-        /**
-         * Contar la cantidad de documentos por aspirante.
-         *
-         * @param aspirante el aspirante para el cual contar los documentos
-         * @return la cantidad de documentos asociados al aspirante
-         */
-        Integer countByAspirante(AspiranteEntity aspirante);
+    /**
+     * Contar la cantidad de documentos por aspirante.
+     *
+     * @param aspirante El aspirante para el cual contar los documentos.
+     * @return La cantidad de documentos asociados al aspirante.
+     */
+    Integer countByAspirante(AspiranteEntity aspirante);
 
-    List<DocumentoEntity> findByAspiranteId(Integer aspiranteId);
 
-    List<DocumentoEntity> findByEstadoId(Integer idEstado);
+    /**
+     * Buscar documentos por ID de aspirante.
+     *
+     * @param aspiranteId El ID del aspirante.
+     * @return Una lista con los documentos del aspirante.
+     */
+    List<DocumentoEntity> findByAspirante_Id(Integer aspiranteId);
+
+    /**
+     * Buscar documentos por ID de estado.
+     *
+     * @param estadoId El ID del estado.
+     * @return Una lista con los documentos que tienen el estado especificado.
+     */
+    List<DocumentoEntity> findByEstado_Id(Integer estadoId);
+
+    /**
+     * Contar la cantidad de documentos por ID de aspirante.
+     *
+     * @param aspiranteId El ID del aspirante.
+     * @return El número de documentos asociados al aspirante.
+     */
+    int countByAspirante_Id(Integer aspiranteId);
 }
+

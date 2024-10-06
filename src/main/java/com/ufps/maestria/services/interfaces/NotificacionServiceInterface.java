@@ -1,9 +1,9 @@
-package com.bezkoder.springjwt.services.interfaces;
+package com.ufps.maestria.services.interfaces;
 
 
 
-import com.bezkoder.springjwt.dto.NotificacionDTO;
-import com.bezkoder.springjwt.models.AspiranteEntity;
+import com.ufps.maestria.dto.NotificacionDTO;
+import com.ufps.maestria.models.AspiranteEntity;
 
 import java.util.List;
 

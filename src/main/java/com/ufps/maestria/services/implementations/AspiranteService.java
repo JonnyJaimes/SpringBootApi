@@ -1,12 +1,14 @@
-package com.bezkoder.springjwt.services.implementations;
+package com.ufps.maestria.services.implementations;
 
-import com.bezkoder.springjwt.exceptions.EmailExistsException;
-import com.bezkoder.springjwt.models.*;
-import com.bezkoder.springjwt.payload.response.AspiranteCohorteResponse;
-import com.bezkoder.springjwt.dto.AspiranteDTO;
-import com.bezkoder.springjwt.dto.UserDTO;
-import com.bezkoder.springjwt.repository.*;
-import com.bezkoder.springjwt.services.interfaces.AspiranteServiceInterface;
+import com.ufps.maestria.exceptions.EmailExistsException;
+
+import com.ufps.maestria.models.*;
+import com.ufps.maestria.payload.response.AspiranteCohorteResponse;
+import com.ufps.maestria.dto.AspiranteDTO;
+import com.ufps.maestria.dto.UserDTO;
+
+import com.ufps.maestria.repository.*;
+import com.ufps.maestria.services.interfaces.AspiranteServiceInterface;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +49,7 @@ public class AspiranteService implements AspiranteServiceInterface {
     private NotificacionService notificacionService;
 
     @Autowired
-    private  EstadoHistorialRepository estadoHistorialRepository;
+    private EstadoHistorialRepository estadoHistorialRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(AspiranteService.class);
 
@@ -64,12 +66,11 @@ public class AspiranteService implements AspiranteServiceInterface {
      */
     @Override
     public AspiranteDTO crearAspirante(AspiranteDTO aspirante, String email) throws EmailExistsException {
-        // Log inicio del proceso
+        // Log the start of the process
         logger.info("Iniciando la creación del aspirante para el email: " + email);
 
-        // Buscar el usuario por correo
+        // Find the user by email
         User user = usuarioRepository.findByEmail(email);
-
         if (user == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado con el correo: " + email);
         }
@@ -78,7 +79,7 @@ public class AspiranteService implements AspiranteServiceInterface {
             throw new EmailExistsException("El aspirante ya existe para este usuario.");
         }
 
-        // Verificar si hay cohorte abierta
+        // Verify if there is an open cohort
         CohorteEntity cohorteAbierto = cohorteRepository.findCohorteByHabilitado(true);
         if (cohorteAbierto == null) {
             throw new EntityNotFoundException("No hay cohorte abierta actualmente.");
@@ -87,19 +88,19 @@ public class AspiranteService implements AspiranteServiceInterface {
         AspiranteEntity newApplicant = null;
 
         try {
-            // Crear la entidad Aspirante y copiar los datos del DTO
+            // Create the Aspirante entity and copy data from the DTO
             AspiranteEntity aspiranteEntity = new AspiranteEntity();
             BeanUtils.copyProperties(aspirante, aspiranteEntity);
 
-            // Asignar el correo del usuario
+            // Assign the user's email
             aspiranteEntity.setCorreoPersonal(user.getEmail());
 
-            // Relacionar al usuario y el cohorte con el aspirante
+            // Link the user and cohort with the aspirant
             aspiranteEntity.setUser(user);
             aspiranteEntity.setEstado(estadoRepository.findById(1).orElseThrow(() -> new EntityNotFoundException("Estado con ID 1 no encontrado")));
             aspiranteEntity.setCohorte(cohorteAbierto);
 
-            // Guardar el aspirante en la base de datos
+            // Save the aspirant in the database
             newApplicant = aspiranteRepository.save(aspiranteEntity);
 
             logger.info("Aspirante creado correctamente con ID: " + newApplicant.getId());
@@ -109,25 +110,30 @@ public class AspiranteService implements AspiranteServiceInterface {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al guardar aspirante", e);
         }
 
-        // Crear directorio para el aspirante
+        // Create a directory for the aspirant
         try {
             fileStorageRepository.createDirectory(cohorteAbierto.getId() + "/" + newApplicant.getId().toString());
             logger.info("Directorio creado para el aspirante con ID: " + newApplicant.getId());
         } catch (Exception e) {
             logger.error("Error al crear el directorio: " + e.getMessage(), e);
-            // Eliminar el aspirante en caso de que la creación del directorio falle
+            // Delete the aspirant if directory creation fails
             aspiranteRepository.delete(newApplicant);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error al crear carpeta", e);
         }
 
-        // Mapear el aspirante creado a un DTO para retornar
+        // Map the created aspirant to a DTO to return
         AspiranteDTO newAspiranteDTO = new AspiranteDTO();
         BeanUtils.copyProperties(newApplicant, newAspiranteDTO);
+
+        // Set cohorteId and estadoId in the DTO
+        newAspiranteDTO.setCohorteId(newApplicant.getCohorte().getId());
+        newAspiranteDTO.setEstadoId(newApplicant.getEstado().getId());
 
         logger.info("Proceso de creación del aspirante completado con éxito.");
 
         return newAspiranteDTO;
     }
+
 
 
     /**
@@ -279,6 +285,7 @@ public class AspiranteService implements AspiranteServiceInterface {
         BeanUtils.copyProperties(aspiranteEntity, aspiranteRetornado);
         return aspiranteRetornado;
     }
+
 
     /**
      * Busca un aspirante por id y le asigna la fecha de la entrevista
@@ -582,6 +589,7 @@ public class AspiranteService implements AspiranteServiceInterface {
         // Check if the email exists in the database
         return usuarioRepository.existsByEmail(email);
     }
+
     public AspiranteDTO getAspiranteByEmail(String email) {
         Optional<AspiranteEntity> aspiranteOpt = aspiranteRepository.findByUser_Email(email);
         if (!aspiranteOpt.isPresent()) {
@@ -662,8 +670,32 @@ public class AspiranteService implements AspiranteServiceInterface {
     // In AspiranteService.java (or AspiranteServiceInterface)
 
     private AspiranteDTO convertToDTO(AspiranteEntity aspirante) {
+
         return new AspiranteDTO(
-                aspirante.getId(), aspirante.getCohorte().getId(), aspirante.getNombre(), aspirante.getApellido(), aspirante.getGenero(), aspirante.getLugar_nac(), aspirante.getFecha_exp_di(), aspirante.getFecha_nac(), aspirante.getNo_documento(), aspirante.getCorreoPersonal(), aspirante.getDepartamento_residencia(), aspirante.getMunicipio_residencia(), aspirante.getDireccion_residencia(), aspirante.getTelefono(), aspirante.getEmpresa_trabajo(), aspirante.getDepartamento_trabajo(), aspirante.getMunicipio_trabajo(), aspirante.getDireccion_trabajo(), aspirante.getEstudios_pregrado(), aspirante.getEstudios_posgrados(), aspirante.getExp_laboral(), aspirante.getEs_egresado_ufps(), aspirante.getTotal(), // Assuming getTotal() calculates the total score
+                aspirante.getId(),
+                aspirante.getCohorte() != null ? aspirante.getCohorte().getId() : null,
+                aspirante.getNombre(),
+                aspirante.getApellido(),
+                aspirante.getGenero(),
+                aspirante.getLugar_nac(),
+                aspirante.getFecha_exp_di(),
+                aspirante.getFecha_nac(),
+                aspirante.getNo_documento(),
+                aspirante.getCorreoPersonal(),
+                aspirante.getDepartamento_residencia(),
+                aspirante.getMunicipio_residencia(),
+                aspirante.getDireccion_residencia(),
+                aspirante.getTelefono(),
+                aspirante.getEmpresa_trabajo(),
+                aspirante.getDepartamento_trabajo(),
+                aspirante.getMunicipio_trabajo(),
+                aspirante.getDireccion_trabajo(),
+                aspirante.getEstudios_pregrado(),
+                aspirante.getEstudios_posgrados(),
+                aspirante.getExp_laboral(),
+                aspirante.getEs_egresado_ufps(),
+                aspirante.getTotal(),
+                // Assuming getTotal() calculates the total score
                 aspirante.getPuntajeNotas(),
                 aspirante.getPuntajeDistincionesAcademicas(),
                 aspirante.getPuntajeExperienciaLaboral(),
@@ -672,7 +704,7 @@ public class AspiranteService implements AspiranteServiceInterface {
                 aspirante.getPuntaje_entrevista(),
                 aspirante.getPuntaje_prueba(),
                 aspirante.getFecha_entrevista(), // Converting LocalDateTime to LocalDate
-                aspirante.getEstado().getId() // Assuming EstadoEntity has an getId method
+                aspirante.getEstado() != null ? aspirante.getEstado().getId() : null // Check for null
         );
     }
 
@@ -680,6 +712,7 @@ public class AspiranteService implements AspiranteServiceInterface {
     @Transactional
     public void cambiarEstado(AspiranteEntity aspirante, EstadoEntity nuevoEstado, String responsable, String comentario) {
         // Cambiamos el estado actual del aspirante
+
         aspirante.setEstado(nuevoEstado);
         aspiranteRepository.save(aspirante);
 
@@ -704,7 +737,7 @@ public class AspiranteService implements AspiranteServiceInterface {
         // Conversion logic here
         return new AspiranteDTO(
                 aspirante.getId(),
-                aspirante.getCohorte().getId(),
+                aspirante.getCohorte() != null ? aspirante.getCohorte().getId() : null, // Check for null
                 aspirante.getNombre(),
                 aspirante.getApellido(),
                 aspirante.getGenero(),
@@ -734,7 +767,7 @@ public class AspiranteService implements AspiranteServiceInterface {
                 aspirante.getPuntaje_entrevista(),
                 aspirante.getPuntaje_prueba(),
                 aspirante.getFecha_entrevista(),
-                aspirante.getEstado().getId() // Assuming EstadoEntity has a getId method
+                aspirante.getEstado() != null ? aspirante.getEstado().getId() : null // Check for null
         );
     }
     public boolean cambiarEsEgresado(Integer aspiranteId) {

@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.exceptions;
+package com.ufps.maestria.exceptions;
 
 public class EmailAlreadyExistsException extends RuntimeException {
     public EmailAlreadyExistsException(String message) {

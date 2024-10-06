@@ -1,12 +1,9 @@
-package com.bezkoder.springjwt.repository;
+package com.ufps.maestria.repository;
 
 
-import com.bezkoder.springjwt.models.AspiranteEntity;
-import com.bezkoder.springjwt.models.CohorteEntity;
-import com.bezkoder.springjwt.models.User;
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
+import com.ufps.maestria.models.AspiranteEntity;
+import com.ufps.maestria.models.CohorteEntity;
+import com.ufps.maestria.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,4 +1,4 @@
-package com.bezkoder.springjwt.models;
+package com.ufps.maestria.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,6 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  * Clase de entidad que representa la tabla "documento" en la base de datos.
@@ -41,6 +40,7 @@ public class DocumentoEntity implements Serializable {
     @JoinColumn(name = "estado_id", nullable = false)
     private EstadoDocEntity estado;
 
+
     @Column(nullable = true)
     private String url;
 
@@ -59,5 +59,20 @@ public class DocumentoEntity implements Serializable {
 
     @Column(nullable = true)
     private String archivo;
+
+
+
+    public Integer getAspiranteId() {
+        return aspirante != null ? aspirante.getId() : null;
+    }
+
+    public Integer getEstadoId() {
+        return estado != null ? estado.getId() : null;
+    }
+
+    public void setEstado(EstadoDocEntity estado) {
+        this.estado = estado;
+    }
+
 
 }

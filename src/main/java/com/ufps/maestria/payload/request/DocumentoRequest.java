@@ -1,8 +1,8 @@
 
-package com.bezkoder.springjwt.payload.request;
+package com.ufps.maestria.payload.request;
 
 
-import com.bezkoder.springjwt.dto.DocumentoDTO;
+import com.ufps.maestria.dto.DocumentoDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

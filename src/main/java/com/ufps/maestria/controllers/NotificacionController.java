@@ -1,13 +1,12 @@
-package com.bezkoder.springjwt.controllers;
+package com.ufps.maestria.controllers;
 
-import com.bezkoder.springjwt.dto.NotificacionDTO;
-import com.bezkoder.springjwt.models.AspiranteEntity;
-import com.bezkoder.springjwt.payload.response.NotificacionResponse;
-import com.bezkoder.springjwt.repository.AspiranteRepository;
-import com.bezkoder.springjwt.services.implementations.NotificacionService;
+import com.ufps.maestria.dto.NotificacionDTO;
+import com.ufps.maestria.models.AspiranteEntity;
+import com.ufps.maestria.payload.response.NotificacionResponse;
+import com.ufps.maestria.repository.AspiranteRepository;
+import com.ufps.maestria.services.implementations.NotificacionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +21,6 @@ import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/notificacion")
